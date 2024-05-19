@@ -3,7 +3,7 @@ interface addressI extends Document{
     region:string
     state:string
     country:string
-    pincode:number
+    postcode:number
 }
 const addressSchema:Schema<addressI>=new mongoose.Schema({
     region:{
@@ -18,7 +18,7 @@ const addressSchema:Schema<addressI>=new mongoose.Schema({
         type:String,
         require:true
     },
-    pincode:{
+    postcode:{
         type:Number,
         require:true
     }

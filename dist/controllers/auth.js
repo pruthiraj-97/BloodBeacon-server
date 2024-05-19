@@ -20,6 +20,7 @@ const otp_generator_1 = __importDefault(require("otp-generator"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const email_1 = require("../config/email");
+const dataValidationError_1 = require("../config/dataValidationError");
 function signUp(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -33,9 +34,10 @@ function signUp(req, res) {
             const typeResult = auth_1.userSignUp.safeParse(user);
             if (!typeResult.success) {
                 const response = (0, zod_validation_error_1.fromZodError)(typeResult.error);
+                const message = (0, dataValidationError_1.dataValidationError)(response.details);
                 return res.status(400).json({
                     success: false,
-                    message: response
+                    message: message
                 });
             }
             const isUserExist = yield user_model_1.default.findOne({
@@ -147,7 +149,9 @@ function login(req, res) {
                 contactNumber: userExist.contactNumber,
                 bloodGroup: userExist.bloodGroup
             };
-            const token = yield jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET);
+            const token = yield jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET, {
+                expiresIn: '1d'
+            });
             const response = res.cookie('token', token, {
                 httpOnly: true,
                 expires: new Date(Date.now() + 60 * 60 * 1000)
@@ -155,7 +159,8 @@ function login(req, res) {
                 .status(200)
                 .json({
                 success: true,
-                message: "login successfully"
+                message: "login successfully",
+                token
             });
             return response;
         }

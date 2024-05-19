@@ -28,6 +28,11 @@ const userSchema = new mongoose_1.default.Schema({
         type: String,
         require: true
     },
+    bloodBank: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: "bloodBank",
+        default: null
+    },
     location: {
         type: {
             type: String,

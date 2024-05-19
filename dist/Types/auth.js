@@ -10,7 +10,9 @@ exports.userSignUp = zod_1.z.object({
         .refine(val => val.toString().length === 10, {
         message: "contact number should be exactly 10 digits"
     }),
-    bloodGroup: zod_1.z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"])
+    bloodGroup: zod_1.z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], {
+        errorMap: () => ({ message: 'Invalid blood group' })
+    })
 });
 exports.userLogin = zod_1.z.object({
     email: zod_1.z.string().email(),

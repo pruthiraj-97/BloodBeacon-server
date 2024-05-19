@@ -6,9 +6,9 @@ import otpGenerator from 'otp-generator'
 import bcrypt from 'bcryptjs'
 import userSchema from "../models/user.model"
 import { sendEmail } from "../config/email";
+import { dataValidationError } from "../config/dataValidationError";
 export async function signUp(req:Request,res:Response){
     try {
-        
         const user={
             name:req.body.name,
             email:req.body.email,
@@ -19,9 +19,10 @@ export async function signUp(req:Request,res:Response){
         const typeResult=userSignUp.safeParse(user)
         if(!typeResult.success){
             const response=fromZodError(typeResult.error)
+            const message=dataValidationError(response.details)
             return res.status(400).json({
                 success:false,
-                message:response
+                message:message
             })
         }
         const isUserExist=await userSchema.findOne({
@@ -130,7 +131,9 @@ export async function login(req:Request,res:Response){
             contactNumber:userExist.contactNumber,
             bloodGroup:userExist.bloodGroup
         }
-        const token=await jwt.sign(payload,process.env.JWT_SECRET!)
+        const token=await jwt.sign(payload,process.env.JWT_SECRET!,{
+            expiresIn:'1d'
+        })
         const response=res.cookie('token',token,{
             httpOnly:true,
             expires:new Date(Date.now()+60*60*1000)
@@ -138,7 +141,8 @@ export async function login(req:Request,res:Response){
                           .status(200)
                           .json({
                               success:true,
-                              message:"login successfully"
+                              message:"login successfully",
+                              token
                           })
         return response
     } catch (error) {

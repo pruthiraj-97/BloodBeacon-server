@@ -22,8 +22,7 @@ export async function registerBloodBank(req:Request,res:Response){
                 message:fromZodError(verifyData.error)
             })
         }
-        // update in user schema of blood bank
-       const user=fetchUserDetails(req)
+       const user=await fetchUserDetails(req)
        const address=await extractLocation(bankDetails.longitude,bankDetails.latitude)
        if(!address){
            return res.status(400).json({
@@ -42,6 +41,11 @@ export async function registerBloodBank(req:Request,res:Response){
             },
             address:newAddress._id
         })
+        await userSchema.updateOne({_id:user.id},{
+            $set:{
+                bloodBank:newBloodBank._id
+            }
+        })
         res.status(200).json({
             success:true,
             message:"blood bank registered successfully"
@@ -59,7 +63,6 @@ export async function setBloodGroups(req:Request,res:Response){
         const id = req.params.id;
         const group = req.query.group;
         const count=req.query.count
-        // Type error is due to that the query must be a string
         if (!group || typeof group !== 'string'|| !count || typeof count !== 'string') {
             return res.status(400).json({
                 success: false,
@@ -100,16 +103,15 @@ export async function setBloodGroups(req:Request,res:Response){
     }
 }
 
-export function getBloodBank(req:Request,res:Response){
+export async function getBloodBank(req:Request,res:Response){
     try {
         const id=req.params.id
-        const bloodBank=BloodBank.findById(id)
+        console.log(id)
+        const bloodBank=await BloodBank.findOne({_id:id})
                                  .populate({
                                     path:'address',
                                  })
-                                 .populate({
-                                    path:'appointments'
-                                 })
+        console.log(bloodBank)
         return res.status(200).json({
             success:true,
             bloodBank:bloodBank

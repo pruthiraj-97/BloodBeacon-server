@@ -17,7 +17,7 @@ const addressSchema = new mongoose_1.default.Schema({
         type: String,
         require: true
     },
-    pincode: {
+    postcode: {
         type: Number,
         require: true
     }

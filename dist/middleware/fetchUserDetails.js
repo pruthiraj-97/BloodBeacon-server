@@ -14,15 +14,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchUserDetails = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-function fetchUserDetails(req) {
+function fetchUserDetails(request) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const token = req.cookies.get("token");
-            if (!token) {
-                throw new Error("Token not found");
+            const token = request.headers['x-access-token'];
+            console.log(token);
+            if (!token || typeof token !== 'string') {
+                throw new Error('Invalid token');
             }
-            const user = yield jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-            return user;
+            const payload = jsonwebtoken_1.default.verify(token, 'bloodbank');
+            if (typeof payload === 'string') {
+                throw new Error('Invalid token');
+            }
+            console.log(payload);
+            return payload;
         }
         catch (error) {
             console.error("Error fetching user details:", error);

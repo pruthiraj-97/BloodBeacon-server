@@ -1,14 +1,19 @@
 import { Request } from "express";
 import jwt from 'jsonwebtoken';
 
-export async function fetchUserDetails(req: Request) {
+export async function fetchUserDetails(request: Request) {
     try {
-        const token = req.cookies.get("token");
-        if (!token) {
-            throw new Error("Token not found");
+        const token = request.headers['x-access-token'];
+        console.log(token)
+        if(!token||typeof token !== 'string'){
+            throw new Error('Invalid token')
         }
-        const user = await jwt.verify(token, process.env.JWT_SECRET!);
-        return user;
+        const payload =jwt.verify(token,'bloodbank')
+        if(typeof payload === 'string'){
+            throw new Error('Invalid token')
+        }
+        console.log(payload)
+        return payload
     } catch (error) {
         console.error("Error fetching user details:", error);
         throw error; 

@@ -22,7 +22,8 @@ const appointmentSchema = new mongoose_1.default.Schema({
         require: true
     },
     bloodBank: {
-        type: mongoose_1.default.Schema.Types.ObjectId
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'bloodBank'
     }
 });
 module.exports = mongoose_1.default.model('appointment', appointmentSchema);

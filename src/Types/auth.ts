@@ -7,7 +7,9 @@ export const userSignUp=z.object({
     .refine(val => val.toString().length === 10, {
         message: "contact number should be exactly 10 digits"
     }),
-    bloodGroup:z.enum(["A+","A-","B+","B-","AB+","AB-","O+","O-"])
+    bloodGroup:z.enum(["A+","A-","B+","B-","AB+","AB-","O+","O-"],{
+        errorMap: () => ({ message: 'Invalid blood group' })
+    })
 })
 export const userLogin=z.object({
     email:z.string().email(),

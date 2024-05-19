@@ -18,6 +18,7 @@ const fetchUserDetails_1 = require("../middleware/fetchUserDetails");
 const extratLocation_1 = require("../config/extratLocation");
 const BloodBank_1 = require("../Types/BloodBank");
 const BloodBank_model_1 = __importDefault(require("../models/BloodBank.model"));
+const user_model_1 = __importDefault(require("../models/user.model"));
 const address_model_1 = __importDefault(require("../models/address.model"));
 function registerBloodBank(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -36,8 +37,7 @@ function registerBloodBank(req, res) {
                     message: (0, zod_validation_error_1.fromZodError)(verifyData.error)
                 });
             }
-            // update in user schema of blood bank
-            const user = (0, fetchUserDetails_1.fetchUserDetails)(req);
+            const user = yield (0, fetchUserDetails_1.fetchUserDetails)(req);
             const address = yield (0, extratLocation_1.extractLocation)(bankDetails.longitude, bankDetails.latitude);
             if (!address) {
                 return res.status(400).json({
@@ -55,6 +55,11 @@ function registerBloodBank(req, res) {
                     coordinates: [bankDetails.longitude, bankDetails.latitude]
                 },
                 address: newAddress._id
+            });
+            yield user_model_1.default.updateOne({ _id: user.id }, {
+                $set: {
+                    bloodBank: newBloodBank._id
+                }
             });
             res.status(200).json({
                 success: true,
@@ -76,7 +81,6 @@ function setBloodGroups(req, res) {
             const id = req.params.id;
             const group = req.query.group;
             const count = req.query.count;
-            // Type error is due to that the query must be a string
             if (!group || typeof group !== 'string' || !count || typeof count !== 'string') {
                 return res.status(400).json({
                     success: false,
@@ -119,25 +123,27 @@ function setBloodGroups(req, res) {
 }
 exports.setBloodGroups = setBloodGroups;
 function getBloodBank(req, res) {
-    try {
-        const id = req.params.id;
-        const bloodBank = BloodBank_model_1.default.findById(id)
-            .populate({
-            path: 'address',
-        })
-            .populate({
-            path: 'appointments'
-        });
-        return res.status(200).json({
-            success: true,
-            bloodBank: bloodBank
-        });
-    }
-    catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: error
-        });
-    }
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const id = req.params.id;
+            console.log(id);
+            const bloodBank = yield BloodBank_model_1.default.findOne({ _id: id })
+                .populate({
+                path: 'address',
+            })
+                .populate('appointments');
+            console.log(bloodBank);
+            return res.status(200).json({
+                success: true,
+                bloodBank: bloodBank
+            });
+        }
+        catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: error
+            });
+        }
+    });
 }
 exports.getBloodBank = getBloodBank;

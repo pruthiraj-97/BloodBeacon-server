@@ -25,7 +25,8 @@ const appointmentSchema:Schema<appointmentI>=new mongoose.Schema({
         require:true
     },
     bloodBank:{
-        type:mongoose.Schema.Types.ObjectId
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'bloodBank'
     }
 })
 module.exports=mongoose.model<appointmentI>('appointment',appointmentSchema)

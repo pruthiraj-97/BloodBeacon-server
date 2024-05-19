@@ -10,7 +10,7 @@ interface userI extends Document{
         coordinates:[number,number]
     }
     requestMessages:mongoose.Schema.Types.ObjectId[],
-    bloodBank?:mongoose.Schema.Types.ObjectId,
+    bloodBank:mongoose.Schema.Types.ObjectId,
     isVarified:boolean,
     varificationCode:number
 }
@@ -39,6 +39,11 @@ const userSchema:Schema<userI>=new mongoose.Schema({
    bloodGroup:{
     type:String,
     require:true
+   },
+   bloodBank:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"bloodBank",
+    default:null
    },
    location:{
     type: {
