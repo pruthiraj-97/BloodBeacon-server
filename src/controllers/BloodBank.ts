@@ -61,15 +61,16 @@ export async function registerBloodBank(req:Request,res:Response){
 export async function setBloodGroups(req:Request,res:Response){
     try {
         const id = req.params.id;
-        const group = req.query.group;
-        const count=req.query.count
+        const group = req.body.group;
+        const count=req.body.count
+        console.log(group,count)
         if (!group || typeof group !== 'string'|| !count || typeof count !== 'string') {
             return res.status(400).json({
                 success: false,
                 message: "cheak your group and count of bloodgroup"
             });
         }
-        const bloodBank = await BloodBank.findById(id);
+        const bloodBank = await BloodBank.findOne({ _id: id });
         if (!bloodBank) {
             return res.status(404).json({
                 success: false,
@@ -77,6 +78,7 @@ export async function setBloodGroups(req:Request,res:Response){
             });
         }
         const bloodGroups = bloodBank.bloodGroups;
+        console.log(bloodGroups)
         if (!bloodGroups.has(group)) {
             return res.status(400).json({
                 success: false,

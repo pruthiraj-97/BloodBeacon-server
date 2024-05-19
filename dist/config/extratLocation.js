@@ -24,7 +24,6 @@ function extractLocation(longitude, latitude) {
             const url = `${apiendpoint}?key=${apikey}&q=${query}&pretty=1`;
             const response = yield axios_1.default.get(url);
             const data = response.data;
-            console.log(data.results);
             const result = data.results[0];
             const components = result.components;
             const address = {

@@ -3,5 +3,5 @@ import { registerBloodBank,getBloodBank,setBloodGroups } from "../controllers/Bl
 const router=Router()
 router.get('/getbloodbank/:id',getBloodBank)
 router.post('/registerbloodbank',registerBloodBank)
-router.put('/updatebloodgroup',setBloodGroups)
+router.put('/updatebloodgroup/:id',setBloodGroups)
 export default router

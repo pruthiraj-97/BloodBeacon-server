@@ -52,14 +52,13 @@ const bloodBankSchema:Schema<bloodBankI>=new mongoose.Schema({
     },
     bloodGroups:{
         type: Map,
-        of: String,
         default:defaultBloodGroups
     },
     appointments:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'appointment'
     }]
-})
+},{timestamps:true})
 
 bloodBankSchema.index({ location: '2dsphere' });
 

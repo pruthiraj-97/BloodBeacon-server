@@ -9,10 +9,9 @@ export async  function extractLocation(longitude:number,latitude:number){
         const url=`${apiendpoint}?key=${apikey}&q=${query}&pretty=1`
         const response=await axios.get(url)
         const data=response.data
-        console.log(data.results)
-    const result=data.results[0]
-    const components=result.components
-    const address:AddressI={
+        const result=data.results[0]
+        const components=result.components
+        const address:AddressI={
         region:components.county,
         state:components.state,
         postcode:parseInt(components.postcode),

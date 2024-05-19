@@ -79,15 +79,16 @@ function setBloodGroups(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const id = req.params.id;
-            const group = req.query.group;
-            const count = req.query.count;
+            const group = req.body.group;
+            const count = req.body.count;
+            console.log(group, count);
             if (!group || typeof group !== 'string' || !count || typeof count !== 'string') {
                 return res.status(400).json({
                     success: false,
                     message: "cheak your group and count of bloodgroup"
                 });
             }
-            const bloodBank = yield BloodBank_model_1.default.findById(id);
+            const bloodBank = yield BloodBank_model_1.default.findOne({ _id: id });
             if (!bloodBank) {
                 return res.status(404).json({
                     success: false,
@@ -95,6 +96,7 @@ function setBloodGroups(req, res) {
                 });
             }
             const bloodGroups = bloodBank.bloodGroups;
+            console.log(bloodGroups);
             if (!bloodGroups.has(group)) {
                 return res.status(400).json({
                     success: false,
@@ -130,8 +132,7 @@ function getBloodBank(req, res) {
             const bloodBank = yield BloodBank_model_1.default.findOne({ _id: id })
                 .populate({
                 path: 'address',
-            })
-                .populate('appointments');
+            });
             console.log(bloodBank);
             return res.status(200).json({
                 success: true,

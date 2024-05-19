@@ -45,14 +45,13 @@ const bloodBankSchema = new mongoose_1.default.Schema({
     },
     bloodGroups: {
         type: Map,
-        of: String,
         default: defaultBloodGroups
     },
     appointments: [{
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'appointment'
         }]
-});
+}, { timestamps: true });
 bloodBankSchema.index({ location: '2dsphere' });
 const BloodBank = mongoose_1.default.model('bloodBank', bloodBankSchema);
 exports.default = BloodBank;
