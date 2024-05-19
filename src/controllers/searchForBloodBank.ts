@@ -1,18 +1,29 @@
 import { Request,Response } from "express";
 import BloodBankSchema from "../models/BloodBank.model";
 import { calculateDistance } from "../config/calculatedistance";
+import { fromZodError } from "zod-validation-error";
+import { searchBloodBankI } from "../Types/BloodBank";
+import { dataValidationError } from "../config/dataValidationError";
 export async function serchNearbyBloodBank(req:Request,res:Response) {
      try {
         const longitude=parseFloat(req.body.longitude)
         const latitude=parseFloat(req.body.latitude)
-        if(!longitude || !latitude){
+        const distance=parseInt(req.body.distance)||20
+        const bloodGroup=req.body.bloodGroup
+        const result=searchBloodBankI.safeParse({
+            longitude,
+            latitude,
+            bloodGroup,
+            distance
+        })
+        if(!result.success){
+            const response=fromZodError(result.error)
+            const message=dataValidationError(response.details)
             return res.status(400).json({
                 success:false,
-                message:"Your location not found"
+                message:message
             })
         }
-        const bloodGroup=req.body.bloodGroup
-        const distance=parseInt(req.body.distance)||20
         const bloodBanks=await BloodBankSchema.find()
                                                .populate('address')
         let searchBloodBanks:any=[]
@@ -22,7 +33,7 @@ export async function serchNearbyBloodBank(req:Request,res:Response) {
                 return
             }
             let coordinate=bloodbank.location.coordinates
-            const fetchDistance=calculateDistance(longitude,latitude,coordinate[0],coordinate[1])
+            const fetchDistance=calculateDistance(latitude,longitude,coordinate[1],coordinate[0])
             if(fetchDistance<distance){
                 searchBloodBanks.push({
                     bloodbank:bloodbank,

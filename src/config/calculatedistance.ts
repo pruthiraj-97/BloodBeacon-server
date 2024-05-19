@@ -11,5 +11,3 @@ export function calculateDistance(lat1:number, lon1:number, lat2:number, lon2:nu
     const distance = R * c;
     return distance;
 }
-let ans=calculateDistance(45.65,67.78,23.45,67.89)
-console.log(ans)

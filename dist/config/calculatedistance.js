@@ -14,5 +14,3 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return distance;
 }
 exports.calculateDistance = calculateDistance;
-let ans = calculateDistance(45.65, 67.78, 23.45, 67.89);
-console.log(ans);

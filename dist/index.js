@@ -9,6 +9,7 @@ const cors_1 = __importDefault(require("cors"));
 const db_1 = require("./config/db");
 const auth_1 = __importDefault(require("./routers/auth"));
 const BloodBank_1 = __importDefault(require("./routers/BloodBank"));
+const BloodBankSearch_1 = __importDefault(require("./routers/BloodBankSearch"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -17,6 +18,7 @@ app.use((0, cors_1.default)({
 }));
 app.use('/api/auth', auth_1.default);
 app.use('/api/bloodbank', BloodBank_1.default);
+app.use('/api/userbloodbank', BloodBankSearch_1.default);
 app.get('/', (req, res, next) => {
     res.send('well come to my server');
 });

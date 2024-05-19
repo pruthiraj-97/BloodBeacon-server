@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { number, z } from 'zod'
 export const BloodBankI=z.object({
     name:z.string(),
     email:z.string().email(),
@@ -9,3 +9,10 @@ export const BloodBankI=z.object({
     latitude:z.number(),
     longitude:z.number()
 }) 
+
+export const searchBloodBankI=z.object({
+    longitude:z.number(),
+    latitude:z.number(),
+    bloodGroup:z.string(),
+    distance:z.number().default(20)
+})

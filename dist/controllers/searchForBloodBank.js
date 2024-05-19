@@ -15,19 +15,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.serchNearbyBloodBank = void 0;
 const BloodBank_model_1 = __importDefault(require("../models/BloodBank.model"));
 const calculatedistance_1 = require("../config/calculatedistance");
+const zod_validation_error_1 = require("zod-validation-error");
+const BloodBank_1 = require("../Types/BloodBank");
+const dataValidationError_1 = require("../config/dataValidationError");
 function serchNearbyBloodBank(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const longitude = parseFloat(req.body.longitude);
             const latitude = parseFloat(req.body.latitude);
-            if (!longitude || !latitude) {
+            const distance = parseInt(req.body.distance) || 20;
+            const bloodGroup = req.body.bloodGroup;
+            const result = BloodBank_1.searchBloodBankI.safeParse({
+                longitude,
+                latitude,
+                bloodGroup,
+                distance
+            });
+            if (!result.success) {
+                const response = (0, zod_validation_error_1.fromZodError)(result.error);
+                const message = (0, dataValidationError_1.dataValidationError)(response.details);
                 return res.status(400).json({
                     success: false,
-                    message: "Your location not found"
+                    message: message
                 });
             }
-            const bloodGroup = req.body.bloodGroup;
-            const distance = parseInt(req.body.distance) || 20;
             const bloodBanks = yield BloodBank_model_1.default.find()
                 .populate('address');
             let searchBloodBanks = [];
@@ -37,7 +48,7 @@ function serchNearbyBloodBank(req, res) {
                     return;
                 }
                 let coordinate = bloodbank.location.coordinates;
-                const fetchDistance = (0, calculatedistance_1.calculateDistance)(longitude, latitude, coordinate[0], coordinate[1]);
+                const fetchDistance = (0, calculatedistance_1.calculateDistance)(latitude, longitude, coordinate[1], coordinate[0]);
                 if (fetchDistance < distance) {
                     searchBloodBanks.push({
                         bloodbank: bloodbank,
