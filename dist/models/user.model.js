@@ -55,7 +55,19 @@ const userSchema = new mongoose_1.default.Schema({
     varificationCode: {
         type: Number,
         required: true
-    }
+    },
+    urgentNotifications: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "requestMessage"
+        }
+    ],
+    messageNotifications: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "message"
+        }
+    ]
 }, { timestamps: true });
 userSchema.index({ location: '2dsphere' });
 const User = mongoose_1.default.model('User', userSchema);

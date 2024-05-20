@@ -12,7 +12,9 @@ interface userI extends Document{
     requestMessages:mongoose.Schema.Types.ObjectId[],
     bloodBank:mongoose.Schema.Types.ObjectId,
     isVarified:boolean,
-    varificationCode:number
+    varificationCode:number,
+    urgentNotifications:mongoose.Schema.Types.ObjectId[],
+    messageNotifications:mongoose.Schema.Types.ObjectId[]
 }
 
 // Note use of document
@@ -55,11 +57,11 @@ const userSchema:Schema<userI>=new mongoose.Schema({
     }
    },
    requestMessages:[
-    {
+     {
        type:mongoose.Schema.Types.ObjectId,
        ref:"requestMessage"
-    }
-  ],
+     }
+   ],
   isVarified:{
     type:Boolean,
     default:false
@@ -67,7 +69,19 @@ const userSchema:Schema<userI>=new mongoose.Schema({
   varificationCode:{
     type:Number,
     required:true
-  }
+  },
+  urgentNotifications:[
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"requestMessage"
+    }
+  ],
+  messageNotifications:[
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"message"
+    }
+  ]
 },{timestamps:true})
 
 userSchema.index({ location: '2dsphere' });

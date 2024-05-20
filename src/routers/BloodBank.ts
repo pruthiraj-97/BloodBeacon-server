@@ -1,7 +1,8 @@
 import { Router } from "express";
+import { isAuthenticate } from "../middleware/isAuthenticate";
 import { registerBloodBank,getBloodBank,setBloodGroups } from "../controllers/BloodBank";
 const router=Router()
-router.get('/getbloodbank/:id',getBloodBank)
-router.post('/registerbloodbank',registerBloodBank)
-router.put('/updatebloodgroup/:id',setBloodGroups)
+router.get('/getbloodbank/:id',isAuthenticate,getBloodBank)
+router.post('/registerbloodbank',isAuthenticate,registerBloodBank)
+router.put('/updatebloodgroup/:id',isAuthenticate,setBloodGroups)
 export default router

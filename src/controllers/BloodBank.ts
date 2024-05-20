@@ -41,6 +41,7 @@ export async function registerBloodBank(req:Request,res:Response){
             },
             address:newAddress._id
         })
+        console.log(newBloodBank)
         await userSchema.updateOne({_id:user.id},{
             $set:{
                 bloodBank:newBloodBank._id

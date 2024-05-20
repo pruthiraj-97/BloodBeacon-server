@@ -19,19 +19,20 @@ function extractLocation(longitude, latitude) {
         try {
             console.log(longitude, latitude);
             const apiendpoint = `https://api.opencagedata.com/geocode/v1/json`;
-            const apikey = `4b33eba298244662a109b229d59355bb`;
+            const apikey = process.env.GEOMAP_APIKEY;
             const query = `${latitude},${longitude}`;
             const url = `${apiendpoint}?key=${apikey}&q=${query}&pretty=1`;
             const response = yield axios_1.default.get(url);
             const data = response.data;
             const result = data.results[0];
             const components = result.components;
+            console.log(components);
             const address = {
                 region: components.county,
                 state: components.state,
-                postcode: parseInt(components.postcode),
                 country: components.country
             };
+            console.log(address);
             return address;
         }
         catch (error) {

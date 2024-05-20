@@ -16,10 +16,6 @@ const addressSchema = new mongoose_1.default.Schema({
     country: {
         type: String,
         require: true
-    },
-    postcode: {
-        type: Number,
-        require: true
     }
 }, { timestamps: true });
 exports.default = mongoose_1.default.model('address', addressSchema);

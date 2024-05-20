@@ -7,6 +7,7 @@ import authRouter from './routers/auth'
 import bloodBankRouter from './routers/BloodBank'
 import searchBloodBank from './routers/BloodBankSearch'
 import messageRouter from './routers/messages'
+import notificationRouter from './routers/notification'
 dotenv.config();
 app.use(express.json())
 app.use(cors({
@@ -16,6 +17,7 @@ app.use('/api/auth',authRouter)
 app.use('/api/bloodbank',bloodBankRouter)
 app.use('/api/userbloodbank',searchBloodBank)
 app.use('/api/messages',messageRouter)
+app.use('/api/notification',notificationRouter)
 app.get('/',(req:Request,res:Response,next:NextFunction)=>{
     res.send('well come to my server')
 })

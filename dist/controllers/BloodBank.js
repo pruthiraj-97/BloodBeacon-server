@@ -56,6 +56,7 @@ function registerBloodBank(req, res) {
                 },
                 address: newAddress._id
             });
+            console.log(newBloodBank);
             yield user_model_1.default.updateOne({ _id: user.id }, {
                 $set: {
                     bloodBank: newBloodBank._id
