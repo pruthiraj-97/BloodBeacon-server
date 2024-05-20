@@ -19,7 +19,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const otp_generator_1 = __importDefault(require("otp-generator"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_model_1 = __importDefault(require("../models/user.model"));
-const email_1 = require("../config/email");
 const dataValidationError_1 = require("../config/dataValidationError");
 function signUp(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -40,18 +39,18 @@ function signUp(req, res) {
                     message: message
                 });
             }
-            const isUserExist = yield user_model_1.default.findOne({
-                $or: [
-                    { email: user.email },
-                    { contactNumber: user.contactNumber }
-                ]
-            });
-            if (isUserExist) {
-                return res.status(400).json({
-                    success: false,
-                    message: "user already exist , please enter a new email or contact number"
-                });
-            }
+            // const isUserExist=await userSchema.findOne({
+            //     $or:[
+            //         {email:user.email},
+            //         {contactNumber:user.contactNumber}
+            //     ]
+            // })
+            // if(isUserExist){
+            //     return res.status(400).json({
+            //         success:false,
+            //         message:"user already exist , please enter a new email or contact number"
+            //     })
+            // }
             const generateOtp = otp_generator_1.default.generate(6, { upperCaseAlphabets: false, specialChars: false,
                 lowerCaseAlphabets: false
             });
@@ -60,7 +59,7 @@ function signUp(req, res) {
             const hashPassword = yield bcryptjs_1.default.hash(user.password, 10);
             user.password = hashPassword;
             const newUser = yield user_model_1.default.create(Object.assign(Object.assign({}, user), { varificationCode: otp }));
-            yield (0, email_1.sendEmail)(newUser.email, newUser.name, otp);
+            // await sendEmail(newUser.email,newUser.name,otp)
             return res.status(200).json({
                 success: true,
                 message: "user created successfully"
@@ -129,12 +128,12 @@ function login(req, res) {
                     message: "user not found"
                 });
             }
-            if (!userExist.isVarified) {
-                return res.status(400).json({
-                    success: false,
-                    message: "user not varified"
-                });
-            }
+            // if(!userExist.isVarified){
+            //     return res.status(400).json({
+            //         success:false,
+            //         message:"user not varified"
+            //     })
+            // }
             const paswordVerify = yield bcryptjs_1.default.compare(loginData.password, userExist.password);
             if (!paswordVerify) {
                 return res.status(400).json({

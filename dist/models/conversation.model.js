@@ -18,4 +18,4 @@ const conversation = new mongoose_1.default.Schema({
         }
     ]
 });
-module.exports = mongoose_1.default.model('conversation', conversation);
+exports.default = mongoose_1.default.model('conversation', conversation);

@@ -1,13 +1,24 @@
-import { resend } from "../utils/resend";
-export async function sendEmail(email:string,name:string,otp:number) {
-  const result=await resend.emails.send({
-    from:process.env.EMAIL_FROM!,
-    to: [email],
-    subject: "verify your email",
-    html: `<strong>hello ${name}!
-           Your email verification OTP is ${otp},
-           start connecting with us
-          </strong>`,
-  })
-  return result
+import nodemailer from 'nodemailer'
+let transporter=nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false,
+    auth:{
+        user:process.env.MAIL_USER,
+        pass:process.env.MAIL_PASS
+    }
+})
+export async function sendEmail(email:string,name:string,otp:number){
+    try {
+        const info=await transporter.sendMail({
+            from:process.env.MAIL_USER,
+            to:email,
+            subject:'test',
+            text:'this is test mail'
+        })
+        console.log(info)
+    } catch (error) {
+        console.log(error)
+    }
+    
 }

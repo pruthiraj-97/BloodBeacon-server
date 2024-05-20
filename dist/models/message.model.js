@@ -22,4 +22,4 @@ const messageSchema = new mongoose_1.default.Schema({
         ref: 'conversation'
     }
 });
-module.exports = mongoose_1.default.model('message', messageSchema);
+exports.default = mongoose_1.default.model('message', messageSchema);

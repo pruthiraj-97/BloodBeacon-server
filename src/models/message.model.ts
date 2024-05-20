@@ -23,4 +23,4 @@ const messageSchema=new mongoose.Schema<messageI>({
         ref:'conversation'
     }
 })
-module.exports=mongoose.model<messageI>('message',messageSchema)
+export default mongoose.model<messageI>('message',messageSchema)

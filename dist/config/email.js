@@ -8,21 +8,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendEmail = void 0;
-const resend_1 = require("../utils/resend");
+const nodemailer_1 = __importDefault(require("nodemailer"));
+let transporter = nodemailer_1.default.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+    }
+});
 function sendEmail(email, name, otp) {
     return __awaiter(this, void 0, void 0, function* () {
-        const result = yield resend_1.resend.emails.send({
-            from: process.env.EMAIL_FROM,
-            to: [email],
-            subject: "verify your email",
-            html: `<strong>hello ${name}!
-           Your email verification OTP is ${otp},
-           start connecting with us
-          </strong>`,
-        });
-        return result;
+        try {
+            const info = yield transporter.sendMail({
+                from: process.env.MAIL_USER,
+                to: email,
+                subject: 'test',
+                text: 'this is test mail'
+            });
+            console.log(info);
+        }
+        catch (error) {
+            console.log(error);
+        }
     });
 }
 exports.sendEmail = sendEmail;

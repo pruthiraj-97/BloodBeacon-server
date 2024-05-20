@@ -25,18 +25,18 @@ export async function signUp(req:Request,res:Response){
                 message:message
             })
         }
-        const isUserExist=await userSchema.findOne({
-            $or:[
-                {email:user.email},
-                {contactNumber:user.contactNumber}
-            ]
-        })
-        if(isUserExist){
-            return res.status(400).json({
-                success:false,
-                message:"user already exist , please enter a new email or contact number"
-            })
-        }
+        // const isUserExist=await userSchema.findOne({
+        //     $or:[
+        //         {email:user.email},
+        //         {contactNumber:user.contactNumber}
+        //     ]
+        // })
+        // if(isUserExist){
+        //     return res.status(400).json({
+        //         success:false,
+        //         message:"user already exist , please enter a new email or contact number"
+        //     })
+        // }
         const generateOtp=otpGenerator.generate(6, {upperCaseAlphabets: false,specialChars: false
         ,lowerCaseAlphabets: false
          })
@@ -48,7 +48,9 @@ export async function signUp(req:Request,res:Response){
             ...user,
             varificationCode:otp
         })
-        await sendEmail(newUser.email,newUser.name,otp)
+
+        // await sendEmail(newUser.email,newUser.name,otp)
+
         return res.status(200).json({
             success:true,
             message:"user created successfully"
@@ -111,12 +113,12 @@ export async function login(req:Request,res:Response){
                 message:"user not found"
             })
         }
-        if(!userExist.isVarified){
-            return res.status(400).json({
-                success:false,
-                message:"user not varified"
-            })
-        }
+        // if(!userExist.isVarified){
+        //     return res.status(400).json({
+        //         success:false,
+        //         message:"user not varified"
+        //     })
+        // }
         const paswordVerify=await bcrypt.compare(loginData.password,userExist.password)
         if(!paswordVerify){
             return res.status(400).json({
