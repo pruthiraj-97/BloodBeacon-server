@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.VarifyUser = exports.signUp = void 0;
+exports.getProfile = exports.login = exports.VarifyUser = exports.signUp = void 0;
 const auth_1 = require("../Types/auth");
 const zod_validation_error_1 = require("zod-validation-error");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -20,6 +20,7 @@ const otp_generator_1 = __importDefault(require("otp-generator"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const dataValidationError_1 = require("../config/dataValidationError");
+const fetchUserDetails_1 = require("../middleware/fetchUserDetails");
 function signUp(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -183,3 +184,26 @@ function login(req, res) {
     });
 }
 exports.login = login;
+function getProfile(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = yield (0, fetchUserDetails_1.fetchUserDetails)(req);
+            const profile = yield user_model_1.default.findOne({ _id: user.id })
+                .populate('bloodBank')
+                .select('-password');
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                profile
+            });
+        }
+        catch (error) {
+            return res.status(500).json({
+                status: 500,
+                success: false,
+                message: error
+            });
+        }
+    });
+}
+exports.getProfile = getProfile;

@@ -20,6 +20,7 @@ export async function serchNearbyBloodBank(req:Request,res:Response) {
             const response=fromZodError(result.error)
             const message=dataValidationError(response.details)
             return res.status(400).json({
+                status:400,
                 success:false,
                 message:message
             })
@@ -43,11 +44,13 @@ export async function serchNearbyBloodBank(req:Request,res:Response) {
         })
         searchBloodBanks.sort((a:any,b:any)=>a.distance-b.distance)
         return res.status(200).json({
+            status:200,
             success:true,
             searchBloodBanks:searchBloodBanks
         })
      } catch (error) {
         return res.status(500).json({
+            status:500,
             success:false,
             message:error
         })

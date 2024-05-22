@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs'
 import userSchema from "../models/user.model"
 import { sendEmail } from "../config/email";
 import { dataValidationError } from "../config/dataValidationError";
+import { fetchUserDetails } from "../middleware/fetchUserDetails";
 export async function signUp(req:Request,res:Response){
     try {
         const user={
@@ -157,6 +158,26 @@ export async function login(req:Request,res:Response){
                               token
                           })
         return response
+    } catch (error) {
+        return res.status(500).json({
+            status:500,
+            success:false,
+            message:error
+        })
+    }
+}
+
+export async function getProfile(req:Request,res:Response){
+    try {
+      const user=await fetchUserDetails(req)
+      const profile=await userSchema.findOne({_id:user.id})
+                                    .populate('bloodBank')
+                                    .select('-password')
+      return res.status(200).json({
+          status:200,
+          success:true,
+          profile
+      })
     } catch (error) {
         return res.status(500).json({
             status:500,

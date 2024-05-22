@@ -15,6 +15,6 @@ exports.BloodBankI = zod_1.z.object({
 exports.searchBloodBankI = zod_1.z.object({
     longitude: zod_1.z.number(),
     latitude: zod_1.z.number(),
-    bloodGroup: zod_1.z.string(),
+    bloodGroup: zod_1.z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
     distance: zod_1.z.number().default(20)
 });

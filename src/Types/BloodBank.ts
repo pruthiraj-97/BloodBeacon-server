@@ -13,6 +13,6 @@ export const BloodBankI=z.object({
 export const searchBloodBankI=z.object({
     longitude:z.number(),
     latitude:z.number(),
-    bloodGroup:z.string(),
+    bloodGroup:z.enum(["A+","A-","B+","B-","AB+","AB-","O+","O-"]),
     distance:z.number().default(20)
 })

@@ -35,6 +35,7 @@ function serchNearbyBloodBank(req, res) {
                 const response = (0, zod_validation_error_1.fromZodError)(result.error);
                 const message = (0, dataValidationError_1.dataValidationError)(response.details);
                 return res.status(400).json({
+                    status: 400,
                     success: false,
                     message: message
                 });
@@ -58,12 +59,14 @@ function serchNearbyBloodBank(req, res) {
             });
             searchBloodBanks.sort((a, b) => a.distance - b.distance);
             return res.status(200).json({
+                status: 200,
                 success: true,
                 searchBloodBanks: searchBloodBanks
             });
         }
         catch (error) {
             return res.status(500).json({
+                status: 500,
                 success: false,
                 message: error
             });
