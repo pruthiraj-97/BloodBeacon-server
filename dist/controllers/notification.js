@@ -12,13 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendNotification = void 0;
+exports.removeNotification = exports.sendNotification = void 0;
 const notification_1 = require("../Types/notification");
 const zod_validation_error_1 = require("zod-validation-error");
 const dataValidationError_1 = require("../config/dataValidationError");
 const user_model_1 = __importDefault(require("../models/user.model"));
 const requestmessage_model_1 = __importDefault(require("../models/requestmessage.model"));
 const fetchUserDetails_1 = require("../middleware/fetchUserDetails");
+const socket_1 = require("../routers/socket");
 function sendNotification(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -42,7 +43,7 @@ function sendNotification(req, res) {
                 bloodGroup: result.data.bloodGroup
             });
             for (const user of allusers) {
-                // if online in this app then send with socket or push it in notification
+                let socketId = (0, socket_1.getUserSocket)(user._id);
                 yield user_model_1.default.updateOne({ _id: user.id }, {
                     $push: {
                         urgentNotifications: newRequest._id
@@ -63,3 +64,27 @@ function sendNotification(req, res) {
     });
 }
 exports.sendNotification = sendNotification;
+function removeNotification(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const id = req.params.id;
+            const user = yield (0, fetchUserDetails_1.fetchUserDetails)(req);
+            yield user_model_1.default.updateOne({ _id: user.id }, {
+                $pull: {
+                    urgentNotifications: req.params.id
+                }
+            });
+            return res.status(200).json({
+                success: true,
+                message: "notification removed"
+            });
+        }
+        catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: error
+            });
+        }
+    });
+}
+exports.removeNotification = removeNotification;

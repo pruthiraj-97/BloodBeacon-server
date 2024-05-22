@@ -20,6 +20,7 @@ const BloodBank_1 = require("../Types/BloodBank");
 const BloodBank_model_1 = __importDefault(require("../models/BloodBank.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const address_model_1 = __importDefault(require("../models/address.model"));
+const dataValidationError_1 = require("../config/dataValidationError");
 function registerBloodBank(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -30,17 +31,22 @@ function registerBloodBank(req, res) {
                 latitude: parseFloat(req.body.latitude),
                 longitude: parseFloat(req.body.longitude)
             };
+            console.log(bankDetails);
             const verifyData = BloodBank_1.BloodBankI.safeParse(bankDetails);
             if (!verifyData.success) {
+                const response = (0, zod_validation_error_1.fromZodError)(verifyData.error);
+                const message = (0, dataValidationError_1.dataValidationError)(response.details);
                 return res.status(400).json({
+                    status: 400,
                     success: false,
-                    message: (0, zod_validation_error_1.fromZodError)(verifyData.error)
+                    message: message
                 });
             }
             const user = yield (0, fetchUserDetails_1.fetchUserDetails)(req);
             const address = yield (0, extratLocation_1.extractLocation)(bankDetails.longitude, bankDetails.latitude);
             if (!address) {
                 return res.status(400).json({
+                    status: 400,
                     success: false,
                     message: "location not found"
                 });
@@ -54,7 +60,8 @@ function registerBloodBank(req, res) {
                     type: 'Point',
                     coordinates: [bankDetails.longitude, bankDetails.latitude]
                 },
-                address: newAddress._id
+                address: newAddress._id,
+                owner: user.id
             });
             console.log(newBloodBank);
             yield user_model_1.default.updateOne({ _id: user.id }, {
@@ -62,13 +69,18 @@ function registerBloodBank(req, res) {
                     bloodBank: newBloodBank._id
                 }
             });
+            const bloodBank = yield BloodBank_model_1.default.findOne({ _id: newBloodBank._id })
+                .populate('address');
             res.status(200).json({
+                status: 200,
                 success: true,
-                message: "blood bank registered successfully"
+                message: "blood bank registered successfully",
+                bloodBank: bloodBank
             });
         }
         catch (error) {
             return res.status(500).json({
+                status: 500,
                 success: false,
                 message: error
             });
@@ -91,7 +103,8 @@ function setBloodGroups(req, res) {
             }
             const bloodBank = yield BloodBank_model_1.default.findOne({ _id: id });
             if (!bloodBank) {
-                return res.status(404).json({
+                return res.status(400).json({
+                    status: 400,
                     success: false,
                     message: "Blood bank not found"
                 });
@@ -111,6 +124,7 @@ function setBloodGroups(req, res) {
                 }
             });
             return res.status(200).json({
+                status: 200,
                 success: true,
                 message: "blood group updated successfully"
             });
@@ -118,6 +132,7 @@ function setBloodGroups(req, res) {
         catch (error) {
             console.error(error);
             return res.status(500).json({
+                status: 500,
                 success: false,
                 message: "An error occurred"
             });
@@ -128,20 +143,21 @@ exports.setBloodGroups = setBloodGroups;
 function getBloodBank(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const id = req.params.id;
-            console.log(id);
-            const bloodBank = yield BloodBank_model_1.default.findOne({ _id: id })
+            const user = yield (0, fetchUserDetails_1.fetchUserDetails)(req);
+            const bloodBank = yield BloodBank_model_1.default.findOne({ owner: user.id })
                 .populate({
                 path: 'address',
             });
             console.log(bloodBank);
             return res.status(200).json({
+                status: 200,
                 success: true,
                 bloodBank: bloodBank
             });
         }
         catch (error) {
             return res.status(500).json({
+                status: 500,
                 success: false,
                 message: error
             });

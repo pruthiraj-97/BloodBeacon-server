@@ -43,6 +43,10 @@ const bloodBankSchema = new mongoose_1.default.Schema({
         type: mongoose_1.default.Schema.Types.ObjectId,
         ref: 'address'
     },
+    owner: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     bloodGroups: {
         type: Map,
         default: defaultBloodGroups

@@ -5,6 +5,8 @@ import { dataValidationError } from "../config/dataValidationError";
 import userSchema from "../models/user.model";
 import requestschema from "../models/requestmessage.model";
 import { fetchUserDetails } from "../middleware/fetchUserDetails";
+import { getUserSocket} from "../routers/socket";
+import io from '../routers/socket'
 export async function sendNotification(req:Request,res:Response){
     try {
         const user=await fetchUserDetails(req)
@@ -32,7 +34,7 @@ export async function sendNotification(req:Request,res:Response){
             bloodGroup:result.data.bloodGroup
         })
        for(const user of allusers){
-        // if online in this app then send with socket or push it in notification
+           let socketId=getUserSocket(user._id)
            await userSchema.updateOne({_id:user.id},{
                $push:{
                 urgentNotifications:newRequest._id
@@ -49,4 +51,25 @@ export async function sendNotification(req:Request,res:Response){
             message:error
         })
     }
+}
+
+export async function removeNotification(req:Request,res:Response){
+   try {
+    const id=req.params.id
+     const user=await fetchUserDetails(req)
+     await userSchema.updateOne({_id:user.id},{
+         $pull:{
+             urgentNotifications:req.params.id
+         }
+     })
+     return res.status(200).json({
+         success:true,
+         message:"notification removed"
+     })
+   } catch (error) {
+     return res.status(500).json({
+         success:false,
+         message:error
+     })
+   }
 }

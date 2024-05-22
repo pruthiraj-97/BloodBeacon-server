@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const isAuthenticate_1 = require("../middleware/isAuthenticate");
 const BloodBank_1 = require("../controllers/BloodBank");
 const router = (0, express_1.Router)();
-router.get('/getbloodbank/:id', BloodBank_1.getBloodBank);
-router.post('/registerbloodbank', BloodBank_1.registerBloodBank);
-router.put('/updatebloodgroup/:id', BloodBank_1.setBloodGroups);
+router.get('/getbloodbank', isAuthenticate_1.isAuthenticate, BloodBank_1.getBloodBank);
+router.post('/registerbloodbank', isAuthenticate_1.isAuthenticate, BloodBank_1.registerBloodBank);
+router.put('/updatebloodgroup/:id', isAuthenticate_1.isAuthenticate, BloodBank_1.setBloodGroups);
 exports.default = router;

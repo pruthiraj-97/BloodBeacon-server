@@ -35,6 +35,7 @@ function signUp(req, res) {
                 const response = (0, zod_validation_error_1.fromZodError)(typeResult.error);
                 const message = (0, dataValidationError_1.dataValidationError)(response.details);
                 return res.status(400).json({
+                    status: 400,
                     success: false,
                     message: message
                 });
@@ -61,12 +62,14 @@ function signUp(req, res) {
             const newUser = yield user_model_1.default.create(Object.assign(Object.assign({}, user), { varificationCode: otp }));
             // await sendEmail(newUser.email,newUser.name,otp)
             return res.status(200).json({
+                status: 200,
                 success: true,
                 message: "user created successfully"
             });
         }
         catch (error) {
             return res.status(500).json({
+                status: 500,
                 success: false,
                 message: error
             });
@@ -81,6 +84,7 @@ function VarifyUser(req, res) {
             const userExist = yield user_model_1.default.findOne({ email });
             if ((userExist === null || userExist === void 0 ? void 0 : userExist.varificationCode) != parseInt(verificationCode)) {
                 return res.status(400).json({
+                    status: 400,
                     success: false,
                     message: "invalid otp"
                 });
@@ -93,12 +97,14 @@ function VarifyUser(req, res) {
                 }
             });
             return res.status(200).json({
+                status: 200,
                 success: true,
                 message: "user varified"
             });
         }
         catch (error) {
             return res.status(500).json({
+                status: 500,
                 success: false,
                 message: error
             });
@@ -117,6 +123,7 @@ function login(req, res) {
             if (!varifyResult.success) {
                 const errorMessage = (0, zod_validation_error_1.fromZodError)(varifyResult.error);
                 return res.status(400).json({
+                    status: 400,
                     success: false,
                     message: errorMessage
                 });
@@ -124,8 +131,9 @@ function login(req, res) {
             const userExist = yield user_model_1.default.findOne({ email: loginData.email });
             if (!userExist) {
                 return res.status(400).json({
+                    status: 400,
                     success: false,
-                    message: "user not found"
+                    message: ["user not found"]
                 });
             }
             // if(!userExist.isVarified){
@@ -137,8 +145,9 @@ function login(req, res) {
             const paswordVerify = yield bcryptjs_1.default.compare(loginData.password, userExist.password);
             if (!paswordVerify) {
                 return res.status(400).json({
+                    status: 400,
                     success: false,
-                    message: "invalid password"
+                    message: ["invalid password"]
                 });
             }
             const payload = {
@@ -157,6 +166,7 @@ function login(req, res) {
             })
                 .status(200)
                 .json({
+                status: 200,
                 success: true,
                 message: "login successfully",
                 token
@@ -165,6 +175,7 @@ function login(req, res) {
         }
         catch (error) {
             return res.status(500).json({
+                status: 500,
                 success: false,
                 message: error
             });

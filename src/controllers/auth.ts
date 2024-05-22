@@ -21,6 +21,7 @@ export async function signUp(req:Request,res:Response){
             const response=fromZodError(typeResult.error)
             const message=dataValidationError(response.details)
             return res.status(400).json({
+                status:400,
                 success:false,
                 message:message
             })
@@ -52,11 +53,13 @@ export async function signUp(req:Request,res:Response){
         // await sendEmail(newUser.email,newUser.name,otp)
 
         return res.status(200).json({
+            status:200,
             success:true,
             message:"user created successfully"
         })
     } catch (error) {
         return res.status(500).json({
+            status:500,
             success:false,
             message:error
         })
@@ -69,6 +72,7 @@ export async function VarifyUser(req:Request,res:Response){
      const userExist=await userSchema.findOne({email})
      if(userExist?.varificationCode!=parseInt(verificationCode)){
         return res.status(400).json({
+            status:400,
             success:false,
             message:"invalid otp"
         })
@@ -81,11 +85,13 @@ export async function VarifyUser(req:Request,res:Response){
         }
     })
     return res.status(200).json({
+        status:200,
         success:true,
         message:"user varified"
     })
    } catch (error) {
        return res.status(500).json({
+           status:500,
            success:false,
            message:error
        })
@@ -102,6 +108,7 @@ export async function login(req:Request,res:Response){
         if(!varifyResult.success){
             const errorMessage=fromZodError(varifyResult.error)
             return res.status(400).json({
+                status:400,
                 success:false,
                 message:errorMessage
             })
@@ -109,8 +116,9 @@ export async function login(req:Request,res:Response){
         const userExist=await userSchema.findOne({email:loginData.email})
         if(!userExist){
             return res.status(400).json({
+                status:400,
                 success:false,
-                message:"user not found"
+                message:["user not found"]
             })
         }
         // if(!userExist.isVarified){
@@ -122,8 +130,9 @@ export async function login(req:Request,res:Response){
         const paswordVerify=await bcrypt.compare(loginData.password,userExist.password)
         if(!paswordVerify){
             return res.status(400).json({
+                status:400,
                 success:false,
-                message:"invalid password"
+                message:["invalid password"]
             })
         }
         const payload={
@@ -142,6 +151,7 @@ export async function login(req:Request,res:Response){
             })
                           .status(200)
                           .json({
+                              status:200,
                               success:true,
                               message:"login successfully",
                               token
@@ -149,6 +159,7 @@ export async function login(req:Request,res:Response){
         return response
     } catch (error) {
         return res.status(500).json({
+            status:500,
             success:false,
             message:error
         })

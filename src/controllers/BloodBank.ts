@@ -6,6 +6,7 @@ import { BloodBankI } from "../Types/BloodBank";
 import BloodBank from "../models/BloodBank.model";
 import userSchema from "../models/user.model";
 import addressSchema from "../models/address.model";
+import { dataValidationError } from "../config/dataValidationError";
 export async function registerBloodBank(req:Request,res:Response){
     try {
         const bankDetails={
@@ -15,17 +16,22 @@ export async function registerBloodBank(req:Request,res:Response){
             latitude:parseFloat(req.body.latitude),
             longitude:parseFloat(req.body.longitude)
         }
+        console.log(bankDetails)
         const verifyData=BloodBankI.safeParse(bankDetails)
         if(!verifyData.success){
+            const response=fromZodError(verifyData.error)
+            const message=dataValidationError(response.details)
             return res.status(400).json({
+                status:400,
                 success:false,
-                message:fromZodError(verifyData.error)
+                message:message
             })
         }
        const user=await fetchUserDetails(req)
        const address=await extractLocation(bankDetails.longitude,bankDetails.latitude)
        if(!address){
            return res.status(400).json({
+               status:400,
                success:false,
                message:"location not found"
            })
@@ -39,7 +45,8 @@ export async function registerBloodBank(req:Request,res:Response){
                 type:'Point',
                 coordinates:[bankDetails.longitude,bankDetails.latitude]
             },
-            address:newAddress._id
+            address:newAddress._id,
+            owner:user.id
         })
         console.log(newBloodBank)
         await userSchema.updateOne({_id:user.id},{
@@ -47,12 +54,17 @@ export async function registerBloodBank(req:Request,res:Response){
                 bloodBank:newBloodBank._id
             }
         })
+        const bloodBank=await BloodBank.findOne({_id:newBloodBank._id})
+                                       .populate('address')
         res.status(200).json({
+            status:200,
             success:true,
-            message:"blood bank registered successfully"
+            message:"blood bank registered successfully",
+            bloodBank:bloodBank
         })
     } catch (error) {
         return res.status(500).json({
+            status:500,
             success:false,
             message:error
         })
@@ -73,7 +85,8 @@ export async function setBloodGroups(req:Request,res:Response){
         }
         const bloodBank = await BloodBank.findOne({ _id: id });
         if (!bloodBank) {
-            return res.status(404).json({
+            return res.status(400).json({
+                status: 400,
                 success: false,
                 message: "Blood bank not found"
             });
@@ -94,12 +107,14 @@ export async function setBloodGroups(req:Request,res:Response){
             }
            });
         return res.status(200).json({
+            status: 200,
             success: true,
             message: "blood group updated successfully"
         })
     } catch (error) {
         console.error(error);
         return res.status(500).json({
+            status: 500,
             success: false,
             message: "An error occurred"
         });
@@ -108,19 +123,20 @@ export async function setBloodGroups(req:Request,res:Response){
 
 export async function getBloodBank(req:Request,res:Response){
     try {
-        const id=req.params.id
-        console.log(id)
-        const bloodBank=await BloodBank.findOne({_id:id})
+        const user=await fetchUserDetails(req)
+        const bloodBank=await BloodBank.findOne({owner:user.id})
                                  .populate({
                                     path:'address',
                                  })
         console.log(bloodBank)
         return res.status(200).json({
+            status:200,
             success:true,
             bloodBank:bloodBank
         })
     } catch (error) {
         return res.status(500).json({
+            status:500,
             success:false,
             message:error
         })

@@ -1,10 +1,12 @@
 import jwt from 'jsonwebtoken';
-export function isAuthenticate(request:any,res:any,next:any){
+import { Request,Response,NextFunction } from 'express';
+export function isAuthenticate(request:Request,res:Response,next:NextFunction){
     try {
         const token = request.headers['x-access-token'];
         console.log(token)
         if(!token||typeof token !== 'string'){
             return res.status(401).json({
+                status:401,
                 success:false,
                 message:"Token not found"
             })
@@ -12,14 +14,18 @@ export function isAuthenticate(request:any,res:any,next:any){
         const payload =jwt.verify(token,'bloodbank')
         if(!payload){
             return res.status(401).json({
+                status:401,
                 success:false,
                 message:"Invalid token , user is auothorized"
             })
         }
         console.log(payload)
-        return payload
+        next()
     } catch (error) {
-        console.error("Error fetching user details:", error);
-        throw error; 
+        return res.status(500).json({
+            status:500,
+            success:false,
+            message:"Internal server error"
+        }) 
     }
 }

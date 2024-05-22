@@ -11,7 +11,8 @@ import notificationRouter from './routers/notification'
 dotenv.config();
 app.use(express.json())
 app.use(cors({
-    origin:process.env.FRONTEND_URL
+    origin:process.env.FRONTEND_URL,
+    credentials:true
 }))
 app.use('/api/auth',authRouter)
 app.use('/api/bloodbank',bloodBankRouter)
