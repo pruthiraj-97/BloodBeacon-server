@@ -5,4 +5,6 @@ const notification_1 = require("../controllers/notification");
 const isAuthenticate_1 = require("../middleware/isAuthenticate");
 const router = (0, express_1.Router)();
 router.post('/sendnotification', isAuthenticate_1.isAuthenticate, notification_1.sendNotification);
+router.get('/getnotification', isAuthenticate_1.isAuthenticate, notification_1.getNotification);
+router.delete('/removenotification/:id', isAuthenticate_1.isAuthenticate, notification_1.removeNotification);
 exports.default = router;

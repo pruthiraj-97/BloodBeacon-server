@@ -20,6 +20,7 @@ export async function sendNotification(req:Request,res:Response){
             const response=fromZodError(result.error)
             const message=dataValidationError(response.details)
             return res.status(400).json({
+                status:400,
                 success:false,
                 message:message
             })
@@ -34,6 +35,7 @@ export async function sendNotification(req:Request,res:Response){
             bloodGroup:result.data.bloodGroup
         })
        for(const user of allusers){
+           if(user._id==user.id) continue
            let socketId=getUserSocket(user._id)
            await userSchema.updateOne({_id:user.id},{
                $push:{
@@ -42,11 +44,13 @@ export async function sendNotification(req:Request,res:Response){
            })
        }
        return res.status(200).json({
+           status:200,
            success:true,
            message:"notification sent"
        })
     } catch (error) {
         return res.status(500).json({
+            status:500,
             success:false,
             message:error
         })
@@ -59,17 +63,55 @@ export async function removeNotification(req:Request,res:Response){
      const user=await fetchUserDetails(req)
      await userSchema.updateOne({_id:user.id},{
          $pull:{
-             urgentNotifications:req.params.id
+             urgentNotifications:id
          }
      })
      return res.status(200).json({
+         status:200,
          success:true,
          message:"notification removed"
      })
    } catch (error) {
      return res.status(500).json({
+         status:500,
          success:false,
          message:error
      })
    }
 }
+
+export async function getNotification(req:Request,res:Response){
+    try {
+        const user=await fetchUserDetails(req)
+        const notifications = await userSchema.findOne({_id: user.id})
+                                          .populate({
+                                              path: 'urgentNotifications',
+                                                populate:{
+                                                  path: 'user',
+                                                  select:['name','contactNumber']
+                                                }
+                                           })
+                                           .populate({
+                                               path:'messageNotifications',
+                                                 populate:{
+                                                    path:'sender',
+                                                    select:['name','contactNumber']
+                                                 }
+                                           })
+                                           .select(['urgentNotifications',
+                                              'messageNotifications' 
+                                            ])
+        return res.status(200).json({
+            status:200,
+            success:true,
+            notifications
+        })
+                                        
+    } catch (error) {
+        return res.status(500).json({
+            status:500,
+            success:false,
+            message:error
+        })
+    }
+} 
