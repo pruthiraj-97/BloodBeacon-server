@@ -5,7 +5,7 @@ export async function connectDB(){
         await mongoose.connect(process.env.DB_URI!) // this means it should be presnect in .env file
         console.log(`connected to db`)
     } catch (error) {
-        console.log("Error in DB connection")
+        console.log("Error in DB connection",error)
         process.exit(1)
     }
 }

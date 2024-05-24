@@ -21,7 +21,7 @@ function connectDB() {
             console.log(`connected to db`);
         }
         catch (error) {
-            console.log("Error in DB connection");
+            console.log("Error in DB connection", error);
             process.exit(1);
         }
     });

@@ -16,7 +16,7 @@ const notification_1 = __importDefault(require("./routers/notification"));
 dotenv_1.default.config();
 socket_1.app.use(express_1.default.json());
 socket_1.app.use((0, cors_1.default)({
-    origin: process.env.FRONTEND_URL,
+    origin: "*",
     credentials: true
 }));
 socket_1.app.use('/api/auth', auth_1.default);

@@ -44,6 +44,8 @@ function sendNotification(req, res) {
                 bloodGroup: result.data.bloodGroup
             });
             for (const user of allusers) {
+                if (user._id == user.id)
+                    continue;
                 let socketId = (0, socket_1.getUserSocket)(user._id);
                 yield user_model_1.default.updateOne({ _id: user.id }, {
                     $push: {
