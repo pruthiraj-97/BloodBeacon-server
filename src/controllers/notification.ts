@@ -37,9 +37,9 @@ export async function sendNotification(req:Request,res:Response){
        for(const user of allusers){
            if(user._id==user.id) continue
            let socketId=getUserSocket(user._id)
-           await userSchema.updateOne({_id:user.id},{
+           await userSchema.updateOne({},{
                $push:{
-                urgentNotifications:newRequest._id
+                  urgentNotifications:newRequest._id
                }
            })
        }
