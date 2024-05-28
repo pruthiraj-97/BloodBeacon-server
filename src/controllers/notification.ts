@@ -31,22 +31,20 @@ export async function sendNotification(req:Request,res:Response){
                 user:user.id
             }
         )
-        const allusers=await userSchema.find({
-            bloodGroup:result.data.bloodGroup
+       
+       const allusers=await userSchema.updateMany({
+           bloodGroup:result.data.bloodGroup,
+           _id:{$ne:user.id}
+        },{
+            $push:{
+                urgentNotifications:newRequest._id
+            }
         })
-       for(const user of allusers){
-           if(user._id==user.id) continue
-           let socketId=getUserSocket(user._id)
-           await userSchema.updateOne({},{
-               $push:{
-                  urgentNotifications:newRequest._id
-               }
-           })
-       }
        return res.status(200).json({
            status:200,
            success:true,
-           message:"notification sent"
+           message:"notification sent",
+           allusers
        })
     } catch (error) {
         return res.status(500).json({

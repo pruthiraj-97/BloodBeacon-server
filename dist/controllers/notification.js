@@ -19,7 +19,6 @@ const dataValidationError_1 = require("../config/dataValidationError");
 const user_model_1 = __importDefault(require("../models/user.model"));
 const requestmessage_model_1 = __importDefault(require("../models/requestmessage.model"));
 const fetchUserDetails_1 = require("../middleware/fetchUserDetails");
-const socket_1 = require("../routers/socket");
 function sendNotification(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -40,23 +39,19 @@ function sendNotification(req, res) {
                 });
             }
             const newRequest = yield requestmessage_model_1.default.create(Object.assign(Object.assign({}, result.data), { user: user.id }));
-            const allusers = yield user_model_1.default.find({
-                bloodGroup: result.data.bloodGroup
+            const allusers = yield user_model_1.default.updateMany({
+                bloodGroup: result.data.bloodGroup,
+                _id: { $ne: user.id }
+            }, {
+                $push: {
+                    urgentNotifications: newRequest._id
+                }
             });
-            for (const user of allusers) {
-                if (user._id == user.id)
-                    continue;
-                let socketId = (0, socket_1.getUserSocket)(user._id);
-                yield user_model_1.default.updateOne({ _id: user.id }, {
-                    $push: {
-                        urgentNotifications: newRequest._id
-                    }
-                });
-            }
             return res.status(200).json({
                 status: 200,
                 success: true,
-                message: "notification sent"
+                message: "notification sent",
+                allusers
             });
         }
         catch (error) {
