@@ -27,18 +27,18 @@ export async function signUp(req:Request,res:Response){
                 message:message
             })
         }
-        // const isUserExist=await userSchema.findOne({
-        //     $or:[
-        //         {email:user.email},
-        //         {contactNumber:user.contactNumber}
-        //     ]
-        // })
-        // if(isUserExist){
-        //     return res.status(400).json({
-        //         success:false,
-        //         message:"user already exist , please enter a new email or contact number"
-        //     })
-        // }
+        const isUserExist=await userSchema.findOne({
+            $or:[
+                {email:user.email},
+                {contactNumber:user.contactNumber}
+            ]
+        })
+        if(isUserExist){
+            return res.status(400).json({
+                success:false,
+                message:"user already exist , please enter a new email or contact number"
+            })
+        }
         const generateOtp=otpGenerator.generate(6, {upperCaseAlphabets: false,specialChars: false
         ,lowerCaseAlphabets: false
          })
