@@ -144,7 +144,7 @@ export async function login(req:Request,res:Response){
             bloodGroup:userExist.bloodGroup
         }
         const token=await jwt.sign(payload,process.env.JWT_SECRET!,{
-            expiresIn:'10m'
+            expiresIn:'24h'
         })
         const response=res.cookie('token',token,{
             httpOnly:true,
