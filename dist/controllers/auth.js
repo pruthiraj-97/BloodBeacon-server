@@ -159,7 +159,7 @@ function login(req, res) {
                 bloodGroup: userExist.bloodGroup
             };
             const token = yield jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET, {
-                expiresIn: '1d'
+                expiresIn: '10m'
             });
             const response = res.cookie('token', token, {
                 httpOnly: true,
