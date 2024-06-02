@@ -20,7 +20,7 @@ app.use('/api/userbloodbank',searchBloodBank)
 app.use('/api/messages',messageRouter)
 app.use('/api/notification',notificationRouter)
 app.get('/',(req:Request,res:Response,next:NextFunction)=>{
-    res.send('well come to my server')
+    res.send('well come blood-beaconserver my server')
 })
 app.listen(process.env.PORT,()=>
     console.log(`server is running on port ${process.env.PORT}`

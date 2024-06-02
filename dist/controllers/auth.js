@@ -41,18 +41,18 @@ function signUp(req, res) {
                     message: message
                 });
             }
-            // const isUserExist=await userSchema.findOne({
-            //     $or:[
-            //         {email:user.email},
-            //         {contactNumber:user.contactNumber}
-            //     ]
-            // })
-            // if(isUserExist){
-            //     return res.status(400).json({
-            //         success:false,
-            //         message:"user already exist , please enter a new email or contact number"
-            //     })
-            // }
+            const isUserExist = yield user_model_1.default.findOne({
+                $or: [
+                    { email: user.email },
+                    { contactNumber: user.contactNumber }
+                ]
+            });
+            if (isUserExist) {
+                return res.status(400).json({
+                    success: false,
+                    message: "user already exist , please enter a new email or contact number"
+                });
+            }
             const generateOtp = otp_generator_1.default.generate(6, { upperCaseAlphabets: false, specialChars: false,
                 lowerCaseAlphabets: false
             });
@@ -159,7 +159,7 @@ function login(req, res) {
                 bloodGroup: userExist.bloodGroup
             };
             const token = yield jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET, {
-                expiresIn: '10m'
+                expiresIn: '24h'
             });
             const response = res.cookie('token', token, {
                 httpOnly: true,

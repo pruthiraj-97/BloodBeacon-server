@@ -9,14 +9,19 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get upgrade -y
 RUN apt-get install -y nodejs
 
+# copy the code file
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 COPY tsconfig.json  tsconfig.json
 # copy everything in current directory
 COPY . . 
+EXPOSE 4000
 
+# install typescript
 RUN npm install -g typescript
-RUN tsc
+# command to compile TS to JS
+RUN tsc  
+#install node module
 RUN npm install
-
+#running the server
 ENTRYPOINT [ "node", "./dist/index.js" ]

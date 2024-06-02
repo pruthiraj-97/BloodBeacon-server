@@ -25,7 +25,7 @@ socket_1.app.use('/api/userbloodbank', BloodBankSearch_1.default);
 socket_1.app.use('/api/messages', messages_1.default);
 socket_1.app.use('/api/notification', notification_1.default);
 socket_1.app.get('/', (req, res, next) => {
-    res.send('well come to my server');
+    res.send('well come blood-beaconserver my server');
 });
 socket_1.app.listen(process.env.PORT, () => console.log(`server is running on port ${process.env.PORT}`));
 (0, db_1.connectDB)();
