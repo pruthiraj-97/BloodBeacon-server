@@ -7,4 +7,5 @@ const router = (0, express_1.Router)();
 router.get('/getbloodbank', isAuthenticate_1.isAuthenticate, BloodBank_1.getBloodBank);
 router.post('/registerbloodbank', isAuthenticate_1.isAuthenticate, BloodBank_1.registerBloodBank);
 router.put('/updatebloodgroup/:id', isAuthenticate_1.isAuthenticate, BloodBank_1.setBloodGroups);
+router.get('/getbloodbank/:id', isAuthenticate_1.isAuthenticate, BloodBank_1.getBloodBankById);
 exports.default = router;

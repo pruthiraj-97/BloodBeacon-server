@@ -142,3 +142,24 @@ export async function getBloodBank(req:Request,res:Response){
         })
     }
 }
+
+export async function getBloodBankById(req:Request,res:Response){
+    try {
+        const id=req.params.id
+        const bloodBank=await BloodBank.findOne({_id:id})
+                                       .populate({
+                                          path:'address',
+                                         })
+        return res.status(200).json({
+            status:200,
+            success:true,
+            bloodBank:bloodBank
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status:500,
+            success:false,
+            message:error
+        })
+    }
+}

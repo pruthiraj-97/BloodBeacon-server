@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBloodBank = exports.setBloodGroups = exports.registerBloodBank = void 0;
+exports.getBloodBankById = exports.getBloodBank = exports.setBloodGroups = exports.registerBloodBank = void 0;
 const zod_validation_error_1 = require("zod-validation-error");
 const fetchUserDetails_1 = require("../middleware/fetchUserDetails");
 const extratLocation_1 = require("../config/extratLocation");
@@ -165,3 +165,27 @@ function getBloodBank(req, res) {
     });
 }
 exports.getBloodBank = getBloodBank;
+function getBloodBankById(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const id = req.params.id;
+            const bloodBank = yield BloodBank_model_1.default.findOne({ _id: id })
+                .populate({
+                path: 'address',
+            });
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                bloodBank: bloodBank
+            });
+        }
+        catch (error) {
+            return res.status(500).json({
+                status: 500,
+                success: false,
+                message: error
+            });
+        }
+    });
+}
+exports.getBloodBankById = getBloodBankById;
