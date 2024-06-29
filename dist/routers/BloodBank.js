@@ -8,4 +8,5 @@ router.get('/getbloodbank', isAuthenticate_1.isAuthenticate, BloodBank_1.getBloo
 router.post('/registerbloodbank', isAuthenticate_1.isAuthenticate, BloodBank_1.registerBloodBank);
 router.put('/updatebloodgroup/:id', isAuthenticate_1.isAuthenticate, BloodBank_1.setBloodGroups);
 router.get('/getbloodbank/:id', isAuthenticate_1.isAuthenticate, BloodBank_1.getBloodBankById);
+router.put('/updatelocation/:id', isAuthenticate_1.isAuthenticate);
 exports.default = router;

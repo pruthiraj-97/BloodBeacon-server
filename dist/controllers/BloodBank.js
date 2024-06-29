@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBloodBankById = exports.getBloodBank = exports.setBloodGroups = exports.registerBloodBank = void 0;
+exports.updateLocation = exports.getBloodBankById = exports.getBloodBank = exports.setBloodGroups = exports.registerBloodBank = void 0;
 const zod_validation_error_1 = require("zod-validation-error");
 const fetchUserDetails_1 = require("../middleware/fetchUserDetails");
 const extratLocation_1 = require("../config/extratLocation");
@@ -21,6 +21,9 @@ const BloodBank_model_1 = __importDefault(require("../models/BloodBank.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const address_model_1 = __importDefault(require("../models/address.model"));
 const dataValidationError_1 = require("../config/dataValidationError");
+const redis_1 = __importDefault(require("../utils/redis"));
+const ApiResponseError_1 = require("../utils/ApiResponseError");
+const serverError_1 = require("../utils/serverError");
 function registerBloodBank(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -144,11 +147,21 @@ function getBloodBank(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const user = yield (0, fetchUserDetails_1.fetchUserDetails)(req);
+            const cacheBloodBank = yield redis_1.default.get(user.id);
+            if (cacheBloodBank) {
+                return res.status(200).json({
+                    status: 200,
+                    success: true,
+                    bloodBank: cacheBloodBank,
+                    message: "from cache"
+                });
+            }
             const bloodBank = yield BloodBank_model_1.default.findOne({ owner: user.id })
                 .populate({
                 path: 'address',
             });
             console.log(bloodBank);
+            yield redis_1.default.set(user.id, JSON.stringify(bloodBank), { EX: 20 });
             return res.status(200).json({
                 status: 200,
                 success: true,
@@ -169,10 +182,20 @@ function getBloodBankById(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const id = req.params.id;
+            const cacheBloodBank = yield redis_1.default.get(id);
+            if (cacheBloodBank) {
+                return res.status(200).json({
+                    status: 200,
+                    success: true,
+                    bloodBank: JSON.parse(cacheBloodBank),
+                    message: "from cache"
+                });
+            }
             const bloodBank = yield BloodBank_model_1.default.findOne({ _id: id })
                 .populate({
                 path: 'address',
             });
+            yield redis_1.default.set(id, JSON.stringify(bloodBank), { EX: 20 });
             return res.status(200).json({
                 status: 200,
                 success: true,
@@ -189,3 +212,26 @@ function getBloodBankById(req, res) {
     });
 }
 exports.getBloodBankById = getBloodBankById;
+function updateLocation(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const id = req.params.id;
+            const { latitude, longitude } = req.body;
+            if (!latitude || !longitude) {
+                return res.status(400).json(new ApiResponseError_1.ApiResponseError(400, false, ['latitude and longitude are required']));
+            }
+            yield BloodBank_model_1.default.updateOne({ _id: id }, {
+                $set: {
+                    location: {
+                        type: "Point",
+                        coordinates: [parseFloat(longitude), parseFloat(latitude)]
+                    }
+                }
+            });
+        }
+        catch (error) {
+            return res.status(500).json(new serverError_1.ServerSiteError(500, false, error.message));
+        }
+    });
+}
+exports.updateLocation = updateLocation;

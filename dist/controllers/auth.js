@@ -21,6 +21,9 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const dataValidationError_1 = require("../config/dataValidationError");
 const fetchUserDetails_1 = require("../middleware/fetchUserDetails");
+const ApiResponse_1 = require("../utils/ApiResponse");
+const ApiResponseError_1 = require("../utils/ApiResponseError");
+const serverError_1 = require("../utils/serverError");
 function signUp(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -35,11 +38,7 @@ function signUp(req, res) {
             if (!typeResult.success) {
                 const response = (0, zod_validation_error_1.fromZodError)(typeResult.error);
                 const message = (0, dataValidationError_1.dataValidationError)(response.details);
-                return res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: message
-                });
+                return res.status(400).json(new ApiResponseError_1.ApiResponseError(400, false, message));
             }
             const isUserExist = yield user_model_1.default.findOne({
                 $or: [
@@ -48,10 +47,7 @@ function signUp(req, res) {
                 ]
             });
             if (isUserExist) {
-                return res.status(400).json({
-                    success: false,
-                    message: "user already exist , please enter a new email or contact number"
-                });
+                return res.status(400).json(new ApiResponseError_1.ApiResponseError(400, false, ['user already exist , please enter a new email or contact number']));
             }
             const generateOtp = otp_generator_1.default.generate(6, { upperCaseAlphabets: false, specialChars: false,
                 lowerCaseAlphabets: false
@@ -62,18 +58,10 @@ function signUp(req, res) {
             user.password = hashPassword;
             const newUser = yield user_model_1.default.create(Object.assign(Object.assign({}, user), { varificationCode: otp }));
             // await sendEmail(newUser.email,newUser.name,otp)
-            return res.status(200).json({
-                status: 200,
-                success: true,
-                message: "user created successfully"
-            });
+            return res.status(200).json(new ApiResponse_1.ApiResponse(200, true, 'user created successfully'));
         }
         catch (error) {
-            return res.status(500).json({
-                status: 500,
-                success: false,
-                message: error
-            });
+            return res.status(500).json(new serverError_1.ServerSiteError(500, false, error.message));
         }
     });
 }
@@ -123,19 +111,11 @@ function login(req, res) {
             const varifyResult = auth_1.userLogin.safeParse(loginData);
             if (!varifyResult.success) {
                 const errorMessage = (0, zod_validation_error_1.fromZodError)(varifyResult.error);
-                return res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: errorMessage
-                });
+                return res.status(400).json(new ApiResponseError_1.ApiResponseError(400, false, errorMessage));
             }
             const userExist = yield user_model_1.default.findOne({ email: loginData.email });
             if (!userExist) {
-                return res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: ["user not found"]
-                });
+                return res.status(400).json(new ApiResponseError_1.ApiResponseError(400, false, ['user not found']));
             }
             // if(!userExist.isVarified){
             //     return res.status(400).json({
@@ -145,11 +125,7 @@ function login(req, res) {
             // }
             const paswordVerify = yield bcryptjs_1.default.compare(loginData.password, userExist.password);
             if (!paswordVerify) {
-                return res.status(400).json({
-                    status: 400,
-                    success: false,
-                    message: ["invalid password"]
-                });
+                return res.status(400).json(new ApiResponseError_1.ApiResponseError(400, false, ['invalid password']));
             }
             const payload = {
                 id: userExist._id,
@@ -175,11 +151,7 @@ function login(req, res) {
             return response;
         }
         catch (error) {
-            return res.status(500).json({
-                status: 500,
-                success: false,
-                message: error
-            });
+            return res.status(500).json(new serverError_1.ServerSiteError(500, false, error));
         }
     });
 }
@@ -198,11 +170,7 @@ function getProfile(req, res) {
             });
         }
         catch (error) {
-            return res.status(500).json({
-                status: 500,
-                success: false,
-                message: error
-            });
+            return res.status(500).json(new serverError_1.ServerSiteError(500, false, error));
         }
     });
 }

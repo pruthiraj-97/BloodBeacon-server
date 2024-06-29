@@ -7,6 +7,9 @@ import BloodBank from "../models/BloodBank.model";
 import userSchema from "../models/user.model";
 import addressSchema from "../models/address.model";
 import { dataValidationError } from "../config/dataValidationError";
+import redisClient from "../utils/redis";
+import { ApiResponseError } from "../utils/ApiResponseError";
+import { ServerSiteError } from "../utils/serverError";
 export async function registerBloodBank(req:Request,res:Response){
     try {
         const bankDetails={
@@ -124,11 +127,21 @@ export async function setBloodGroups(req:Request,res:Response){
 export async function getBloodBank(req:Request,res:Response){
     try {
         const user=await fetchUserDetails(req)
+        const cacheBloodBank=await redisClient.get(user.id)
+        if(cacheBloodBank){
+            return res.status(200).json({
+                status:200,
+                success:true,
+                bloodBank:cacheBloodBank,
+                message:"from cache"
+            })
+        }
         const bloodBank=await BloodBank.findOne({owner:user.id})
                                  .populate({
                                     path:'address',
                                  })
         console.log(bloodBank)
+        await redisClient.set(user.id,JSON.stringify(bloodBank),{EX:20})
         return res.status(200).json({
             status:200,
             success:true,
@@ -146,10 +159,20 @@ export async function getBloodBank(req:Request,res:Response){
 export async function getBloodBankById(req:Request,res:Response){
     try {
         const id=req.params.id
+        const cacheBloodBank=await redisClient.get(id)
+        if(cacheBloodBank){
+            return res.status(200).json({
+                status:200,
+                success:true,
+                bloodBank:JSON.parse(cacheBloodBank),
+                message:"from cache"
+            })
+        }
         const bloodBank=await BloodBank.findOne({_id:id})
                                        .populate({
                                           path:'address',
                                          })
+        await redisClient.set(id,JSON.stringify(bloodBank),{EX: 20})
         return res.status(200).json({
             status:200,
             success:true,
@@ -162,4 +185,24 @@ export async function getBloodBankById(req:Request,res:Response){
             message:error
         })
     }
+}
+
+export async function updateLocation(req:Request,res:Response){
+    try {
+        const id=req.params.id
+    const {latitude,longitude}=req.body
+    if(!latitude || !longitude){
+        return res.status(400).json(new ApiResponseError(400,false,['latitude and longitude are required']))
+    }
+    await BloodBank.updateOne({_id:id},{
+        $set:{
+           location:{
+               type:"Point",
+               coordinates:[parseFloat(longitude),parseFloat(latitude)]
+           }
+        }
+    })
+    } catch (error:any) {
+        return res.status(500).json(new ServerSiteError(500,false,error.message))
+    } 
 }
