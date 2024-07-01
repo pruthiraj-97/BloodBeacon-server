@@ -189,18 +189,25 @@ export async function getBloodBankById(req:Request,res:Response){
 
 export async function updateLocation(req:Request,res:Response){
     try {
-        const id=req.params.id
+    const id=req.params.id
     const {latitude,longitude}=req.body
     if(!latitude || !longitude){
         return res.status(400).json(new ApiResponseError(400,false,['latitude and longitude are required']))
     }
-    await BloodBank.updateOne({_id:id},{
+    const newLocation={
+        type:"Point",
+        coordinates:[parseFloat(longitude),parseFloat(latitude)]
+    }
+    const result=await BloodBank.updateOne({_id:id},{
         $set:{
-           location:{
-               type:"Point",
-               coordinates:[parseFloat(longitude),parseFloat(latitude)]
-           }
+            location:newLocation
         }
+    })
+    
+    return res.status(200).json({
+        status:200,
+        success:true,
+        message:"Location updated successfully"
     })
     } catch (error:any) {
         return res.status(500).json(new ServerSiteError(500,false,error.message))

@@ -220,13 +220,19 @@ function updateLocation(req, res) {
             if (!latitude || !longitude) {
                 return res.status(400).json(new ApiResponseError_1.ApiResponseError(400, false, ['latitude and longitude are required']));
             }
-            yield BloodBank_model_1.default.updateOne({ _id: id }, {
+            const newLocation = {
+                type: "Point",
+                coordinates: [parseFloat(longitude), parseFloat(latitude)]
+            };
+            const result = yield BloodBank_model_1.default.updateOne({ _id: id }, {
                 $set: {
-                    location: {
-                        type: "Point",
-                        coordinates: [parseFloat(longitude), parseFloat(latitude)]
-                    }
+                    location: newLocation
                 }
+            });
+            return res.status(200).json({
+                status: 200,
+                success: true,
+                message: "Location updated successfully"
             });
         }
         catch (error) {
