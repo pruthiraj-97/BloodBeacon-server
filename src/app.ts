@@ -8,7 +8,6 @@ import bloodBankRouter from './routers/BloodBank'
 import searchBloodBank from './routers/BloodBankSearch'
 import messageRouter from './routers/messages'
 import notificationRouter from './routers/notification'
-import redisClient  from "./utils/redis";
 dotenv.config();
 app.use(express.json())
 app.use(cors({
@@ -21,7 +20,6 @@ app.use('/api/userbloodbank',searchBloodBank)
 app.use('/api/messages',messageRouter)
 app.use('/api/notification',notificationRouter)
 app.get('/',async (req:Request,res:Response,next:NextFunction)=>{
-    await redisClient.get("ti")
     res.send('well come blood-beaconserver my server')
 })
 app.listen(process.env.PORT,()=>

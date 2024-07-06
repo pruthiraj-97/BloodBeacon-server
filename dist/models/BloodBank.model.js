@@ -53,7 +53,7 @@ const bloodBankSchema = new mongoose_1.default.Schema({
     },
     appointments: [{
             type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: 'appointment'
+            ref: 'Appointment'
         }]
 }, { timestamps: true });
 bloodBankSchema.index({ location: '2dsphere' });

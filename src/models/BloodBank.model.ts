@@ -10,7 +10,8 @@ interface bloodBankI extends Document{
     address:mongoose.Schema.Types.ObjectId,
     bloodGroups:Map<string,number>,
     appointments:mongoose.Schema.Types.ObjectId[],
-    owner:mongoose.Schema.Types.ObjectId
+    owner:mongoose.Schema.Types.ObjectId,
+    appointment:mongoose.Schema.Types.ObjectId[]
 }
 const defaultBloodGroups = () => {
     return new Map([
@@ -61,7 +62,7 @@ const bloodBankSchema:Schema<bloodBankI>=new mongoose.Schema({
     },
     appointments:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'appointment'
+        ref:'Appointment'
     }]
 },{timestamps:true})
 
