@@ -24,4 +24,4 @@ RUN tsc
 #install node module
 RUN npm install
 #running the server
-ENTRYPOINT [ "node", "./dist/index.js" ]
+ENTRYPOINT [ "node", "./dist/app.js" ]
