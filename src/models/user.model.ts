@@ -85,6 +85,7 @@ const userSchema:Schema<userI>=new mongoose.Schema({
 },{timestamps:true})
 
 userSchema.index({ location: '2dsphere' });
+userSchema.index({email:1})
 
 const User = mongoose.model<userI>('User', userSchema);
 export default User
